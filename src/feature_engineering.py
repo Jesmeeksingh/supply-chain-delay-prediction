@@ -238,7 +238,6 @@ def finalize_features(df):
         "Shipment Mode",
         "Country",
         "Manufacturer",
-        "Vendor",
         "Item Description",
         "Molecule/Test Type",
         "ID",
@@ -317,3 +316,10 @@ def add_joint_risk_score(
     )
 
     return df
+
+def move_target_to_last(df, target_col="Delayed"):
+    """
+    Moves the target column to the last position
+    """
+    cols = [c for c in df.columns if c != target_col] + [target_col]
+    return df[cols]

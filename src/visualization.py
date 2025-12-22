@@ -289,3 +289,92 @@ def visualize_vendor_fulfill_delay_percentage(df, top_n=15):
     plt.legend(title="Fulfill Via")
     plt.tight_layout()
     plt.show()
+
+def visualize_vendor_product_group_delay_heatmap(df, min_shipments):
+    """
+    Heatmap of delay percentage for Vendor vs Product Group
+    """
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    summary = (
+        df
+        .groupby(["Vendor", "Product Group"])["Delayed"]
+        .agg(
+            total_shipments="count",
+            delay_rate="mean"
+        )
+        .reset_index()
+    )
+
+    # Filter noise
+    summary = summary[summary["total_shipments"] >= min_shipments]
+
+    # Convert to percentage
+    summary["delay_percentage"] = summary["delay_rate"] * 100
+
+    pivot = summary.pivot(
+        index="Vendor",
+        columns="Product Group",
+        values="delay_percentage"
+    )
+
+    plt.figure(figsize=(14, 8))
+    sns.heatmap(
+        pivot,
+        cmap="Reds",
+        annot=True,
+        fmt=".1f",
+        linewidths=0.5
+    )
+
+    plt.title("Delay Percentage Heatmap: Vendor vs Product Group")
+    plt.ylabel("Vendor")
+    plt.xlabel("Product Group")
+    plt.tight_layout()
+    plt.show()
+
+def visualize_delay_by_first_line_designation(df):
+    """
+    Bar plot of delay percentage by First Line Designation
+    """
+    import matplotlib.pyplot as plt
+
+    summary = (
+        df.groupby("First Line Designation")["Delayed"]
+        .mean()
+        * 100
+    )
+
+    plt.figure(figsize=(6, 4))
+    summary.plot(kind="bar")
+    plt.title("Delay Percentage by First Line Designation")
+    plt.ylabel("Delay Percentage")
+    plt.xlabel("First Line Designation")
+    plt.xticks(rotation=0)
+    plt.tight_layout()
+    plt.show()
+def visualize_feature_correlation_heatmap(df):
+    """
+    Plots correlation heatmap for numeric features
+    """
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    # Correlation matrix
+    corr = df.corr()
+
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(
+        corr,
+        annot=True,
+        fmt=".2f",
+        cmap="coolwarm",
+        center=0,
+        square=True,
+        linewidths=0.5
+    )
+
+    plt.title("Feature Correlation Heatmap")
+    plt.tight_layout()
+    plt.show()

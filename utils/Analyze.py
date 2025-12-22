@@ -137,3 +137,85 @@ def delay_proportion_by_subclassification(df, min_samples=30):
     print(summary)
 
     return summary
+def analyze_first_line_designation(df):
+    import pandas as pd
+
+    summary = (
+        df.groupby("First Line Designation")["Delayed"]
+        .agg(
+            total_shipments="count",
+            delayed_shipments="sum",
+            delay_percentage="mean"
+        )
+        .reset_index()
+    )
+
+    summary["delay_percentage"] *= 100
+    print("\nFirst Line Designation Summary:")
+    print(summary)
+
+    return summary
+def analyze_vendor_inco_dependency(df, top_n=20):
+    """
+    Shows how many INCO terms each vendor uses
+    """
+    import pandas as pd
+
+    vendor_inco_counts = (
+        df.groupby("Vendor")["Vendor INCO Term"]
+        .nunique()
+        .sort_values(ascending=False)
+    )
+
+    print("\nNumber of unique INCO terms per vendor (top vendors):")
+    print(vendor_inco_counts.head(top_n))
+
+    return vendor_inco_counts
+
+def analyze_vendor_inco_delay(df, top_n=10, min_shipments=30):
+    """
+    Analyze Vendor × Vendor INCO Term × Delay proportion
+    """
+
+    import pandas as pd
+
+    # Count shipments per vendor
+    vendor_counts = (
+        df.groupby("Vendor")
+        .size()
+        .sort_values(ascending=False)
+        .head(top_n)
+        .index
+    )
+
+    # Filter to top vendors
+    filtered_df = df[df["Vendor"].isin(vendor_counts)]
+
+    summary = (
+        filtered_df
+        .groupby(["Vendor", "Vendor INCO Term"])
+        .agg(
+            total_shipments=("Delayed", "count"),
+            delayed_shipments=("Delayed", "sum")
+        )
+        .reset_index()
+    )
+
+    # Compute delay proportion
+    summary["delay_proportion"] = (
+        summary["delayed_shipments"] / summary["total_shipments"]
+    )
+
+    # Filter small samples
+    summary = summary[summary["total_shipments"] >= min_shipments]
+
+    # Sort for readability
+    summary = summary.sort_values(
+        by="delay_proportion",
+        ascending=False
+    )
+
+    print("\nVendor × Vendor INCO Term × Delay Proportion:")
+    print(summary)
+
+    return summary
