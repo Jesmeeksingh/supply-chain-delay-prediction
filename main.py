@@ -5,6 +5,8 @@ from src.feature_engineering import move_target_to_last,add_subclassification_ri
 from src.visualization import visualize_feature_correlation_heatmap,visualize_delay_by_first_line_designation,visualize_vendor_product_group_delay_heatmap,visualize_delay_counts, visualize_shipment_mode, visualize_cost_vs_delay,visualize_delay_by_shipment_mode,visualize_delay_proportion_by_shipment_mode,visualize_top_countries_delay_by_shipment_mode, delay_rate_by_weight_and_mode,delay_percentage_by_manufacturing_site,delay_percentage_by_fulfill_via,visualize_vendor_fulfill_delay_percentage
 from utils.Analyze import analyze_vendor_inco_delay,analyze_vendor_inco_dependency,analyze_first_line_designation,delay_proportion_by_subclassification,check_delay_counts_by_mode_and_country,count_vendors_by_fulfill_via,vendor_fulfill_via_delay_counts,analyze_delay_by_weight,missing_values_percentage_in_PQ_to_PO_days
 from utils.debugging_funcs import log_shape
+from src.models.logistic_regression import train_logistic_regression, show_feature_importance
+from src.evaluation.metrics import evaluate_model
 
 def run_pipeline():
     # 1. Load & Clean
@@ -114,6 +116,14 @@ def run_pipeline():
 
     print("New df shape: ",df_new.shape)
     # print("Feature matrix shape:", X.shape)
+        # Train model
+    model, X_train, X_test, y_train, y_test = train_logistic_regression(df)
+
+    # Evaluate
+    evaluate_model(model, X_test, y_test)
+
+    # Feature importance
+    show_feature_importance(model, X_train.columns)
 
 if __name__ == "__main__":
     run_pipeline()
