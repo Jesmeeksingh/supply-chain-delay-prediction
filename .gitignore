@@ -1,6 +1,3 @@
-# Data files
-data/Raw/
-data/Processed/*.csv
 
 # ML artifacts
 artifacts/
