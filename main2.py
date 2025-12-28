@@ -49,7 +49,7 @@ def run_pipeline():
     # STEP 1: Load & Clean
     # ========================================================================
     df = load_supply_chain_data(
-        "C:\\Users\\jesme\\OneDrive\\Desktop\\Supply_chain_ml_project\\data\\Raw\\SCMS_Delivery_History_Dataset_20150929.csv"
+        r"data/Raw/raw_data.csv"
     )
     
     log_shape(df, "Cleaning data...")
