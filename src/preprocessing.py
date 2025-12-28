@@ -37,7 +37,7 @@
 
 #     return df
 
-
+#  src/preprocessing.py
 from utils.debugging_funcs import log_shape   
 # src/preprocessing.py
 import pandas as pd
@@ -83,5 +83,8 @@ def clean_data(df):
     df[cat_cols] = df[cat_cols].fillna("Unknown")
 
     log_shape(df, "After filling categorical nulls")
+    
+    # Standardize specific categorical values
+    df["Shipment Mode"] = df["Shipment Mode"].replace("Unknown", "Others")
 
     return df
